@@ -4,7 +4,9 @@
 
 项目启动  
 npm i docsify-cli -g 首选全局安装docsify-cli
+
 docsify serve 启动项目
+
 访问 localhost:3000
 
 前端入门到进阶图文教程。从零开始学前端，做一名精致的前端工程师。持续更新中。本项目的主要作用有：  
