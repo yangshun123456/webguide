@@ -162,7 +162,7 @@ JavaScript是由网景公司（Netscape）发明，最初命名为LiveScript；1
 - **[05-Promise入门详解.md](./06-JavaScript异步编程：Ajax和Promise/05-Promise入门详解.md)**
 - **[06-Promise的链式调用.md](./06-JavaScript异步编程：Ajax和Promise/06-Promise的链式调用.md)**
 - **[07-Promise的静态方法.md](./06-JavaScript异步编程：Ajax和Promise/07-Promise的静态方法.md)**
-- **[08-Async Await函数详解.md](./06-JavaScript异步编程：Ajax和Promise/08-Async Await函数详解.md)**
+- **[08-Async Await函数详解.md](./06-JavaScript异步编程：Ajax和Promise/08-Async%20Await函数详解.md)**
 - **[09-宏任务和微任务.md](./06-JavaScript异步编程：Ajax和Promise/09-宏任务和微任务.md)**
 - **[函数封装-Ajax发送http请求（get&post）.md](./06-JavaScript异步编程：Ajax和Promise/函数封装-Ajax发送http请求（get&post）.md)**
 
