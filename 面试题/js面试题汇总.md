@@ -175,10 +175,11 @@ console.log((()=>{}) instanceof Object) // true
 > 8. unshift() 方法，在数组前插入一个元素
 > 9. pop() 方法，取出第最后一个元素，并删除
 > 10. shift() 方法，去除第一个元素，并删除
-> 11. sort() 排序
-> 12. slice(start, end) 返回截断后的数组，不改变原数组
-> 13. splice(start, number, value) 返回删除元素组成的数组，value 为插入项，改变原数组
-> 14. concat()拼接多个数组，返回拼接后的数组
+> 11. sort((a, b) => { return a - b }) 排序 要是返会小于0，就是a在前b在后
+> 12. reverse() 反转
+> 13. slice(start, end) 返回截断后的数组，不改变原数组
+> 14. splice(start, number, value) 返回删除元素组成的数组，value 为插入项，改变原数组
+> 15. concat()拼接多个数组，返回拼接后的数组
 
 ### 字符串（String）方法
 > 1. toLowerCase() 此方法用于把字符串转为小写，并返回新的字符串。
@@ -212,3 +213,101 @@ console.log((()=>{}) instanceof Object) // true
 > - Math.trunc()函数，返回的是一个数的整数部分，不管正数还是负数，直接去掉小数点及之后的部分。
 
 ### JavaScript 原型，原型链 ? 有什么特点？
+> - 原型分为隐式原型__proto__ 和 显式原型(prototype原型对象)，每个对象都有它的隐式原型__proto__，指向它对应构造函数的显式原型(prototype)
+> - 无论何时，只要创建一个函数，就会为这个函数添加一个 prototype 属性
+> - 构造函数的 prototype 指向原型对象，原型对象有一个 constructor 属性指回构造函数，每个构造函数生成的实例对象都有一个__proto__ 属性，这个属性也指向prototype。
+> - 每个对象都有__proto__ 属性，这个属性指向prototype，当想访问对象的一个属性时，如果这个对象本身没有这个属性就会通过__proto__属性 查找，prototype也是对象，每个对象又有自己的__proto__ 属性，所以就会一直这样查找上去，直到找到这个属性，这就是原型链的概念。
+> - 原型链就是对象沿着__proto__ 这条链逐步向上搜索，最顶层是 Object，Object 的__proto__ 是 null。
+
+### 说说什么是事件代理(事件委托)?
+> - 是 js 中常用绑定事件的常技巧。“事件代理”是把原本需要绑定的事件委托给父元素，让父元素担当事件监听的职务。事件代理的原理是 DOM 元素的事件冒泡。使用事件委托的好处是可以提高性能。
+> - 可以大量节省内存占用，减少事件注册，当新增子对象时无需再次对其绑定。
+
+### 什么是作用域，什么是作用域链？
+> - 作用域是代码中定义变量的区域, js中采用词法作用域（静态作用域） 即函数作用域在函数定义时决定的。分为全局作用域和函数作用域。
+> - 全局作用域：程序的任何地方都能访问如window对象的内置属性
+> - 函数作用域：在函数中才能访问的属性，不同作用域下同名变量不会有冲突
+> - ES6增加了块级作用域
+> - 每个函数都有一个作用域链，查找变量或方法时，会先从函数作用域逐层查找最后到全局作用域查找，这些作用域的集合称为作用域链。
+
+### 说说对浅拷贝 和 深拷贝的理解
+> - 浅拷贝：如果拷贝的是基本数据类型相当于直接拷贝它的值，修改值互不影响。如果拷贝的是引用数据类型，拷贝的就是指向堆内存里面这个对象的内存地址，如果修改了其中一个对象的数据，那么另一个对象也会受到影响，因为内存地址指向堆里面同一块内存。常用 es6 0bject.assign() 实现。
+> - 深拷贝：深拷贝是将一个对象完整的独立拷贝一份出来，然后在堆内存中开辟一块新的内存块存储，所以不会互相影响。JSON.parse(JSON.stringify(a)) 注意：JSON.parse(JSON.stringify(a)) undefined会被删除 NaN转为null。
+
+###  js常见的继承方式
+> 1. 原型链继承
+     子构造函数的prototype指向new 父构造函数()  
+     Student.prototype = new Person() // 子类型的原型为父类型的一个实例对象  
+     或Student.prototype.\_\_proto__ = Person.protoType
+> 2. 借用构造函数继承，在子构造函数里面调用父构造函数  
+     function Student(name, age, price) {  
+       Person.call(this, name, age)  // 相当于: this.Person(name, age)  
+       this.price = price  
+     }
+> 3. ES6中class 的继承，通过extends关键字去继承父类
+
+### 判断一个值是什么类型有哪些方法
+> 1. 使用instanceOf
+> 2. 使用typeof
+> 3. 使用xx.prototype.constructor() === Number 去判断
+> 4. 使用Object.prototype.toString.call(1) === '[object Number]'
+
+### 判断数组的方式有哪些？
+> 1. typeOf
+> 2. instanceOf
+> 3. Object.prototype.toString.call([]) === '[object Array]'
+> 4. [].prototype.constructor() === Array
+> 5. arr.\_\_proto__ === Array.prototype
+> 6. Array.isArray([])
+> 7. Array.prototype.isPrototypeOf(arr)
+
+### parseInt(string, radix);把字符串转化为整数
+> - 第一个参数时要转换的数值会自动转成string
+> - 第二个参数标识这个数是一个几进制的数
+> - 返回值是十进制的
+> - 从左至右依次遍历，直到不满足进制条件终端，如果第一位就不是返回NAN，且小数点不能被转换，因为不符合条件如  parseInt(0.0000005) 为 5，因为0.0000005会被转换为5e-7，所以取了5，e-7无法识别，舍弃。
+
+### http状态码的了解
+> - 2 开头的表示请求成功，200表示一切正常
+> - 3 开头的表示重定向，301永久重定向，302临时重定向，304客户端请求资源成功，但是资源是从浏览器缓存中取得。
+> - 4 开头表示客户端错误，400表示请求报文中存在语法错误，401表示发送的请求需要有通过HTTP认证的认证信息，403服务器资源权限不够，常见跨域，404请求资源不存在
+> - 5 开头表示服务器端错误，500表明服务器端在执行请求时发生了错误，502表示服务正在部署，503，表示服务器处于停机维护或超负载，无法处理请求
+
+### js 数组去重的方法
+> 1. 利用 es6 Set 去重
+> 2. 利用sort排序后使用for循环比较当前一个与前一个是否相等，如果不等则把当前的放入空数组内
+> 3. 利用双重for循环，然后比较是否相等，类似2
+
+### js 数组合并
+> 1. arr1.concat(arr2, ······)
+> 2. […arr1, …arr2]
+> 3. arr1.push(...arr2, ...arr3)
+
+### js 对象合并的方法 
+> - Object.assign()
+
+### 说说es6的新增特性
+> - let、const： 声明变量和常量
+> - 模板字符串：增强版的字符串，用反引号标识，嵌入变量只需要放在${}中
+> - 箭头函数：ES6中函数定义不再使用关键字function()，而是利用了()=>来进行定义
+> - 解构赋值：按照类型的不同有不同的方式提取值，赋值
+> - Symbol：新增的基本数据类型，特点就是里面的值唯一
+> - Set 和 Map 数据结构
+> - 展开运算符(…): 可以将数组或对象里面的值展开, 还可以将 Set 数据结构转换为数组
+> - for...of 循环: 可以遍历数组对象以及 Set 和 Map 数据结构
+> - class 类：通过 extends 实现继承
+> - promise、(async/await): 都是用来解决异步编程的方案
+> - proxy：代理对象，直接监听对象的变化，然后触发相应的逻辑
+
+### Promise是什么？
+> - Promise 是 es6 引入解决异步编程问题的解决方案
+> - Promise 有三种状态：pending(进行中)、resolve(已完成)、reject(已失败)
+> - 当 Promise 的状态由 pending 转变为 resolved 或 reject 时，会执行相应的回调, 一旦从 pending 状态变成为其他状态就不能再更改状态了
+> - 可以链式调用，解决回调地狱的问题
+> - Promise.all() 传入一组 Promise 数组，只有当所有的 Promise 状态都成功才返回成功，只要有一个失败就返回失败的 Promise 状态
+> - Promise.race() 传入一个 Promise 数组，返回的结果由第一个执行完成的 Promise对象 的结果来决定，，其他任务任然会执行，只不过执行结果会被抛弃
+
+### 怎么让一个函数无论promise对象成功和失败都能被调用？
+> - Promise.finally() finally 方法用于不管 Promise 的状态变为什么，都会执行它内部的函数
+
+
