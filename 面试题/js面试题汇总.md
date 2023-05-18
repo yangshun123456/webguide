@@ -310,4 +310,74 @@ console.log((()=>{}) instanceof Object) // true
 ### 怎么让一个函数无论promise对象成功和失败都能被调用？
 > - Promise.finally() finally 方法用于不管 Promise 的状态变为什么，都会执行它内部的函数
 
+### 什么是ajax？
+> - 传统的Web应用程序在用户与服务器进行交互时需要刷新整个页面才能获取新的数据或更新内容，Ajax，可以通过在后台与服务器进行异步通信，只更新页面的一部分内容，而无需刷新整个页面。
 
+### ajax优点
+> - 提升用户体验：Ajax允许在不刷新整个页面的情况下更新部分内容，使用户可以实时获取和显示数据，从而提供更流畅、响应更快的用户体验。
+> - 减少带宽消耗：由于只更新部分内容，而不是整个页面，Ajax可以减少从服务器传输的数据量，节省带宽和减轻服务器负载。
+> - 异步通信：Ajax的异步通信机制允许浏览器在等待服务器响应时执行其他操作，提高应用程序的效率和并发性。
+> - 增量更新：通过Ajax，可以实现增量更新网页的功能，只加载新的数据或内容，而无需重新加载整个页面，减少了不必要的重复加载和渲染。
+> - 跨平台兼容性：Ajax技术可以在各种浏览器和操作系统上使用，使得开发者能够构建跨平台的Web应用程序。
+
+### ajax缺点
+> - 对搜索引擎不友好：由于Ajax是在后台进行数据交换和更新，搜索引擎难以获取到完整的页面内容，这可能影响到搜索引擎的索引和排名。
+> - 前进/后退按钮的问题：由于Ajax应用程序的页面更新是通过JavaScript动态实现的，浏览器的前进和后退按钮可能无法正确地导航用户到之前浏览的状态。
+> - 对JavaScript依赖性：Ajax应用程序需要依赖JavaScript来进行异步通信和页面更新，如果用户的浏览器禁用了JavaScript，那么Ajax功能将无法正常工作。
+
+### localStorage和sessionStorage和cookie区别
+> - localStorage：数据存储在浏览器的本地存储区域中，不会随着会话结束而清除，除非显式删除或清除浏览器缓存。通常支持较大的存储容量，可以存储几兆字节的数据（一般是5M），不会自动发送给服务器，仅在客户端使用。。
+> - sessionStorage：同localStorage，但是数据存储在会话存储区域中，仅在当前会话期间有效。当会话结束（关闭标签页或浏览器）时，数据将被清除，当在页面中通过js如window.open打开一个新标签时，会复制一份sessionStorage过去，两份相互独立。
+> - cookie：数据存储在浏览器的cookie中，可以设置过期时间，可以在会话期间一直存在，或者在特定时间后自动过期。存储容量较小，通常限制为几KB。可以设置cookie的域名和路径，可以在同一域名下的多个页面间共享。每次HTTP请求都会将cookie数据发送给服务器。
+
+### es6的 set
+> - set它类似于数组，但是成员的值都是唯一的，没有重复的值
+> - add(value)：添加某个值，返回 Set 结构本身。
+> - delete(value)：删除某个值，返回一个布尔值，表示删除是否成功。
+> - has(value)：返回一个布尔值，表示该值是否为 Set 的成员。
+> - clear()：清除所有成员，没有返回值。
+> - Set 结构的实例与数组一样，也拥有 forEach 方法，用于对每个成员执行某种操作，没有返回值。
+
+遍历方法
+```javascript
+// 由于set只有键值没有键名，也可以说键和值是同一个，所以keys和values返回值相同
+for(const key of set.keys()){//keys()返回集合所有的键（key）
+  console.log(key);
+}
+
+for(const val of set.values()){//valuse()返回的是集合中所有的键(key)所对应的值(value)
+  console.log(val)
+}
+// 方法2
+sets.forEach(function(key,value) {
+  console.log(`${key}:${value}`)
+})
+```
+
+### es6的 map
+> - Map 对象保存键值对，任何值（对象或者原始值） 都可以作为一个键或一个值。它类似于对象，也是键值对的集合，但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。也就是说，Object 结构提供了“字符串 — 值”的对应，Map 结构提供了“值 — 值”的对应，是一种更完善的 Hash 结构实现。如果你需要“键值对”的数据结构，Map 比 Object 更合适。
+> - size 属性返回 Map 结构的成员总数。map.size
+> - set 方法设置 key 所对应的键值，然后返回整个 Map 结构。如果 key 已经有值，则键值会被更新，否则就新生成该键。
+> - get 方法读取 key 对应的键值，如果找不到 key，返回 undefined。
+> - has 方法返回一个布尔值，表示某个键是否在 Map 数据结构中。
+> - delete 方法删除某个键，返回 true。如果删除失败，返回 false。
+> - clear 方法清除所有成员，没有返回值。  
+> - keys方法返回所有键值
+> - values方法返回所有值
+> - entries方法返回键值数组 [[1,'one'], [2, 'two'], [3, 'three']]
+
+遍历方法
+```javascript
+// 方法一
+for (var [key, value] of myMap) {
+  console.log(key + " = " + value);
+}
+// 方法二
+for (var [key, value] of myMap.entries()) {
+  console.log(key + " = " + value);
+}
+// 方法3
+myMap.forEach(function (value, key) {
+  console.log(key + " = " + value);
+}, myMap);
+```
