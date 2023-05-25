@@ -177,4 +177,137 @@ export default {
 > - location.reload()
 > - $router.go(0)
 
-### 
+### vue双向绑定的原理
+> - 通过Object.defineProperty方法劫持数据，在数据修改的时候调用对应的update方法
+
+## vue3面试题
+### Vue2.0 和 Vue3.0 有什么区别？
+> 1. 性能的提升
+> - 打包大小减少41%
+> - 初次渲染快55%, 更新渲染快133%
+> - 内存减少54%
+> 2. 使用Proxy代替defineProperty实现响应式
+> 3. 新的内置组件Teleport
+> 4. Vue3可以更好的支持TypeScript
+> 5. Composition API（组合API）
+> 6. 新的生命周期钩子
+> 7. 移除过滤器（filter）
+
+### Teleport内置组件
+> - 可以将teleport组件中包裹着的元素传送到外层的位置中去```<Teleport to="body"></Teleport>```
+> - 禁用 Teleport```<Teleport :disabled="isMobile">```
+> - 多个 Teleport 共享目标 ```<Teleport to="#modals"><div>A</div></Teleport><Teleport to="#modals"><div>B</div></Teleport>```
+
+### vue3双向绑定性能提升
+> - vue2使用Object.defineProperty进行数据劫持，但是这个方法只能对属性进行监听，无法监听对象，如果要监听需要遍历对象的key进行属性劫持。
+> - vue3使用es6的proxy代理实现的，通过指定代理对象操作目标对象，可以监听对象内的属性变化，不需要遍历key。
+
+### proxy的使用
+> 1. get(target, propKey, receiver)
+> 2. set(target, propKey, value, receiver)
+> 3. has(target, propKey)
+> 4. deleteProperty(target, propKey)
+> 5. apply(target, object, args) 拦截 Proxy 实例作为函数调用的操作，比如proxy(...args)、proxy.call(object, ...args)、proxy.apply(...)。
+```javascript
+let isPrime = function (number) {
+  return number
+}
+let proxy = new Proxy(isPrime, {
+  apply: (target, object, args) => {
+    console.time('aaa')
+    const result = target.apply(object, args)
+    console.timeEnd('bbb')
+    return result
+  }
+})
+proxy(666)
+```
+
+### vue3生命周期
+> - vue3.0中可以继续使用Vue2.x中的生命周期钩子，但有有两个被更名
+> 1. beforeDestroy改名为 beforeUnmount
+> 2. destroyed改名为 unmounted
+> - Vue3.0也提供了 Composition API 形式的生命周期钩子，与Vue2.x中钩子对应关系如下：
+> 1. beforeCreate===>setup()
+> 2. created=======>setup()
+> 3. beforeMount ===>onBeforeMount
+> 4. mounted=======>onMounted
+> 5. beforeUpdate===>onBeforeUpdate
+> 6. updated =======>onUpdated
+> 7. beforeUnmount ==>onBeforeUnmount
+> 8. unmounted =====>onUnmounted
+
+### Vue3.0中的响应式原理是什么？vue2的响应式原理是什么？
+> - vue2.x的响应式
+> 1. 对象类型：通过Object.defineProperty()对属性的读取、修改进行拦截（数据劫持）。
+> 2. 数组类型：通过重写更新数组的一系列方法来实现拦截如：push、pop、shift、unshift、splice、sort、reverse共七个。（对数组的变更方法进行了包裹）。
+> - vue3.0的响应式
+> 1. 通过Proxy（代理）: 拦截对象中任意属性的变化, 包括：属性值的读写、属性的添加、属性的删除等。
+> 2. 通过Reflect（反射）: 对源对象的属性进行操作。
+```javascript
+new Proxy(data, {
+    // 拦截读取属性值
+    get (target, prop) {
+        return Reflect.get(target, prop)
+    },
+    // 拦截设置属性值或添加新属性
+    set (target, prop, value) {
+        return Reflect.set(target, prop, value)
+    },
+    // 拦截删除属性
+    deleteProperty (target, prop) {
+        return Reflect.deleteProperty(target, prop)
+    }
+})
+```
+
+### vue3响应式数据的判断？
+> - isRef: 检查一个值是否为一个 ref 对象
+> - isReactive: 检查一个对象是否是由 reactive 创建的响应式代理
+> - isReadonly: 检查一个对象是否是由 readonly 创建的只读代理
+> - isProxy: 检查一个对象是否是由 reactive 或者 readonly 方法创建的代理
+
+### vue3的常用 Composition API有哪些？
+> - reactive：用于创建一个响应式的对象，将普通对象转换为响应式对象
+> - ref：用于创建一个包装器对象，将普通数据类型转换为响应式对象。
+> - computed：计算属性
+> - watch：监听属性 ```watch(sum,(newValue,oldValue)=>{
+    console.log('sum的值变化了',newValue,oldValue)
+    },{immediate:true,deep:true})```
+> 1. 监听reactive定义的响应式数据，会强制开启深度监听（deep：true），无法获取正确的oldvalue（变化前的值）。
+> 2. 监听reactive定义的响应式数据中的某个属性(对象形式)时，不会强制开启深度监听，需要自己手动设置（deep：true）才会有效果。
+> - watchEffect：类似于watch，但不需要显式指定要监视的数据。它会自动追踪在其内部使用的响应式数据，并在其变化时执行回调函数，比较类似computed
+> - toRef： 复制 reactive 里的单个属性并转成 ref，这样创建的 ref 与其源属性保持同步：改变源属性的值将更新 ref 的值，反之亦然。
+> - toRefs：复制 reactive 里的所有属性并转成 ref，这个普通对象的每个属性都是指向源对象相应属性的 ref
+```javascript
+function useFeatureX() {
+  const state = reactive({
+    foo: 1,
+    bar: 2
+  })
+
+  // ...基于状态的操作逻辑
+
+  // 在返回时都转为 ref
+  return toRefs(state)
+}
+
+// 可以解构而不会失去响应性
+const { foo, bar } = useFeatureX()
+```
+> - onMounted 和 onUnmounted 函数：onMounted 函数用于在组件挂载到DOM后执行一次性的副作用操作，而 onUnmounted 函数用于在组件卸载时执行清理操作。
+> - defineProps：用于获取传递过来的props
+> - defineEmit：用于定义当前组件含有的事件
+> - useAttrs：获取attrs
+> - toRaw：将一个由reactive生成的响应式对象转为普通对象。
+> - markRaw：标记一个对象，使其永远不会再成为响应式对象。
+
+### setup的几个注意点
+> - 在beforeCreate之前执行一次，this是undefined。
+> - setup的参数：
+> 1. props：值为对象，包含：组件外部传递过来，且组件内部声明接收了的属性。
+> 2. context：上下文对象包括，attrs: 值为对象，包含：组件外部传递过来，但没有在props配置中声明的属性, 相当于 this.$attrs。
+> slots: 收到的插槽内容, 相当于 this.$slots。emit: 分发自定义事件的函数, 相当于 this.$emit。
+
+
+
