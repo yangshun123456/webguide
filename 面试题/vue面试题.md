@@ -187,7 +187,7 @@ export default {
 > - 初次渲染快55%, 更新渲染快133%
 > - 内存减少54%
 > 2. 使用Proxy代替defineProperty实现响应式
-> 3. 新的内置组件Teleport
+> 3. 新的内置组件Teleport，Fragment
 > 4. Vue3可以更好的支持TypeScript
 > 5. Composition API（组合API）
 > 6. 新的生命周期钩子
@@ -197,6 +197,10 @@ export default {
 > - 可以将teleport组件中包裹着的元素传送到外层的位置中去```<Teleport to="body"></Teleport>```
 > - 禁用 Teleport```<Teleport :disabled="isMobile">```
 > - 多个 Teleport 共享目标 ```<Teleport to="#modals"><div>A</div></Teleport><Teleport to="#modals"><div>B</div></Teleport>```
+
+### Fragment
+> - 在Vue2中: 组件必须有一个根标签
+> - 在Vue3中: 组件可以没有根标签, 内部会将多个标签包含在一个Fragment虚拟元素中
 
 ### vue3双向绑定性能提升
 > - vue2使用Object.defineProperty进行数据劫持，但是这个方法只能对属性进行监听，无法监听对象，如果要监听需要遍历对象的key进行属性劫持。
@@ -309,5 +313,62 @@ const { foo, bar } = useFeatureX()
 > 2. context：上下文对象包括，attrs: 值为对象，包含：组件外部传递过来，但没有在props配置中声明的属性, 相当于 this.$attrs。
 > slots: 收到的插槽内容, 相当于 this.$slots。emit: 分发自定义事件的函数, 相当于 this.$emit。
 
+### reactive对比ref
+> - ref用来定义：基本类型数据。reactive用来定义：对象（或数组）类型数据。ref也可以用来定义对象（或数组）类型数据, 它内部会自动通过reactive转为代理对象。
+> - ref通过Object.defineProperty()的get与set来实现响应式（数据劫持）。reactive通过使用Proxy来实现响应式（数据劫持）, 并通过Reflect操作源对象内部的数据。
+> - ref定义的数据：操作数据需要.value，读取数据时模板中直接读取不需要.value。reactive定义的数据：操作数据与读取数据：均不需要.value。
+
+### 么是hook？什么是自定义hook函数？
+> - 本质是一个函数，把setup函数中使用的Composition API进行了封装。
+> - 类似于vue2.x中的mixin，引入后直接调用就可以。
+> - 自定义hook的优势: 复用代码, 让setup中的逻辑更清楚易懂。
+```javascript
+import {onBeforeMount, onBeforeUnmount, reactive} from 'vue'
+export default function () {
+    const point = reactive({
+        x:0,
+        y:0
+    })
+    function savePoint (event) {
+        point.y = event.pageY
+        point.x = event.pageX
+        console.log('x,y', point.y, point.x)
+    }
+    onBeforeMount(() => {
+        // 监听click事件
+        window.addEventListener('click',savePoint)
+    })
+    onBeforeUnmount(() => {
+        window.removeEventListener('click',savePoint)
+    })
+    return point
+}
+```
+```html
+
+<script>
+    import {ref} from 'vue'
+    import usePoint from '../hooks/usePoint'
+    export default {
+        name: 'Demo',
+        setup(){
+            //数据
+            let sum = ref(0)
+            // 引用公共hook函数
+            let point = usePoint()
+            return {
+                sum,
+                point
+            }
+        },
+    }
+</script>
+```
+
+### Options（选项式） API 存在的问题是什么？Composition（组合式） API 的优势有哪些？
+> - 使用传统OptionsAPI中，新增或者修改一个需求，就需要分别在data，methods，computed里修改。
+> - 组合式API我们可以更加优雅的组织我们的代码，函数。让相关功能的代码更加有序的组织在一起。
+
+### 
 
 
