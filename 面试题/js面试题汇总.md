@@ -381,3 +381,75 @@ myMap.forEach(function (value, key) {
   console.log(key + " = " + value);
 }, myMap);
 ```
+
+### js操作盒子模型的13个API（client、offset、scroll三大系列）
+> 1. client系列：
+> - clientWidth（可视区域）: 获取盒子的内容width+左右的padding
+> - clientHeight（可视区域）: 获取盒子的内容height+上下的padding
+> - clientTop:获取盒子的上边框的粗细
+> - clientLeft:获取盒子的左边框的粗细
+> 2. offset系列
+> - offsetWidth: box.offsetWidth  在clientWidth的基础上加了border
+> - offsetHeight: box.offsetHeight  在clientHeight的基础上加了border
+> - offsetTop: 获取一个绝对定位元素相对于参考点的上面的距离
+> - offsetLeft: 获取一个绝对定位元素相对于参考点的左面的距离
+> - offsetParent(***): 获取一个定位元素的参考点
+> 3. scroll系列:
+> - scrollWidth: 在没有内容溢出(水平方向上的溢出)的情况下：scrollWidth == clientWidth
+    在内容溢出的情况下：scrollWidth的值约等于真实内容的宽度，不同浏览器中得到的值可能不一样
+    overflow属性会影响scrollWidth。
+    只能获取值，不能设置值
+> - scrollHeight：同理scrollWidth
+> - scrollTop：获取垂直滚动条滚动的距离（获取垂直滚动条卷去的高度），不只可以获取，也可以设置（可读可写）
+> - scrollLeft： 可以获取，也可以设置（可读可写）
+> - scrollIntoView({{ block: "start", behavior: "smooth" })：让元素滚动到可视区域
+> - scrollIntoViewIfNeeded(true)：同上，如果在可视区域则不滚动，指有一个参数，无法指定平滑滚动的行为。
+
+### getComputedStyle方法
+> - 用于获取计算后的样式信息。它接受一个参数，即要获取样式的元素，然后返回一个包含元素所有计算后样式属性和对应值的对象。
+```javascript
+const element = document.getElementById('myElement');
+const styles = window.getComputedStyle(element);
+
+const color = styles.color;
+const fontSize = styles.fontSize;
+```
+
+### getBoundingClientRect方法
+> - 用于获取元素相对于**视口**的位置和尺寸信息。它返回一个包含多个属性的 DOMRect 对象，这些属性描述了元素的位置、尺寸和边界信息。
+> - 使用 getBoundingClientRect 可以获取元素在视口中的位置和尺寸，相对于视口左上角的坐标系。
+```javascript
+const element = document.getElementById('myElement');
+const rect = element.getBoundingClientRect();
+// rect包括 top left right bottom width height
+const top = rect.top;
+const width = rect.width;
+```
+
+### http缓存
+
+## 性能优化
+### 虚拟列表
+> - 对于渲染后端返回的很长的数据列表时，如果渲染全部则很消耗性能，使用虚拟列表可以让性能提升。
+> - 实现原理是，在初始化时计算出整体列表的长度给最外层，让显示列表以sticky的方式固定在头部，然后根据滚动距离计算出当前应该渲染的数据，显示上去。
+
+### 图片懒加载
+> - img标签不设置src属性时不会去请求资源，所以我们可以自定义一个lazy-src属性写上资源名，当滚动到图片位置时，把lazy-src赋值给src上。
+
+### 雪碧图
+> - 将不怎么需要变动的一切图片组合起来成一张图，
+> - 将雪碧图以背景图的方式显示出来。background-image: url('')
+> - 设置宽高。
+> - 设置不平铺。background-repeat: no-repeat
+> - 在使用的时候通过background-position属性设置水平和垂直偏移
+
+### 检查组件销毁前是否清除定时器
+> - 如果有定时器轮询调用接口，需要检查是否在销毁时清除。
+
+### 避免重绘（repaint）和回流（reflow）
+> - 将修改样式的操作移出循环，避免多次回流
+> - 使用css3transform 代替position left top等修改元素位置
+> - 避免使用table进行布局，因为每个单元格修改会引起整个表格回流，使用css布局
+> - 使用虚拟化技术，避免一次性渲染过多节点，从而减少回流次数
+> - 使用 CSS 动画代替 JavaScript 动画：CSS 动画通常使用浏览器的硬件加速来执行动画，避免了频繁的回流和重绘
+
