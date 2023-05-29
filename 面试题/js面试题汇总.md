@@ -426,7 +426,92 @@ const top = rect.top;
 const width = rect.width;
 ```
 
+## http相关
+
 ### http缓存
+> - 控制强制缓存的字段分别是Expires和Cache-Control，其中Cache-Control优先级比Expires高。
+> 1. Expires：用于控制缓存的到期时间，如果客户端的时间小于到期时间，则直接获取缓存。缺点是，返回的时间时服务器的时间，但是比对的是客户端的时间，可能会存在误差。
+> 2. Cache-Control：用于控制网页缓存，主要有public（所有内容都会被缓存，代理服务器和客户端都可以缓存），private（默认值，指有客户端可以缓存），no-cache（客户端缓存内容，但是是否使用缓存需要经过协商缓存验证决定），no-store（不使用缓存），max-age=xxx（缓存将在xxx秒后失效）
+> - 强制缓存：
+> 1. 强制缓存会先向浏览器缓存中寻找缓存结果和缓存标识，如果没有，则直接向服务器请求资源。
+> 2. 如果存在缓存资源和缓存标识，但是缓存失效了，会启用协商缓存。
+> 3. 如果缓存还没有过期失效，则直接返回缓存的资源。  
+例子:  
+![](img/lizi.png)  
+由于Cache-Control的优先级比expires，那么直接根据Cache-Control的值进行缓存，意思就是说在600秒内再次发起该请求，则会直接使用缓存结果，强制缓存生效。
+
+> - 控制协商缓存的字段分别有：Last-Modified / If-Modified-Since和Etag / If-None-Match，其中Etag / If-None-Match的优先级比Last-Modified / If-Modified-Since高。
+> 1. Last-Modified是服务器响应请求时，返回该资源文件在服务器最后被修改的时间，
+> 2. If-Modified-Since是客户端再次发起该请求时，携带上次请求返回的Last-Modified值，通过此字段值告诉服务器该资源上次请求返回的最后被修改时间。服务器收到该请求，发现请求头含有If-Modified-Since字段，则会根据If-Modified-Since的字段值与该资源在服务器的最后被修改时间做对比，若服务器的资源最后被修改时间大于If-Modified-Since的字段值，则重新返回资源，状态码为200；否则则返回304，代表资源无更新，可继续使用缓存文件。
+> 3. Etag是服务器响应请求时，返回当前资源文件的一个唯一标识(由服务器生成)
+> 4. If-None-Match是客户端再次发起该请求时，携带上次请求返回的唯一标识Etag值，通过此字段值告诉服务器该资源上次请求返回的唯一标识值。服务器收到该请求后，发现该请求头中含有If-None-Match，则会根据If-None-Match的字段值与该资源在服务器的Etag值做对比，一致则返回304，代表资源无更新，继续使用缓存文件；不一致则重新返回资源文件，状态码为200。
+> - 协商缓存：协商缓存就是强制缓存失效后，浏览器携带缓存标识向服务器发起请求，由服务器根据缓存标识决定是否使用缓存的过程
+> 1. 协商缓存生效，返回304
+> 2. 协商缓存失效，返回200和请求结果结果
+
+### 如何使用 HTTP 缓存？
+1. HTML 页面禁用缓存的设置如下：
+```html
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="expires" content="0"> 
+```
+2. HTML 设置使用缓存如下：
+```html
+<meta http-equiv="Cache-Control" content="max-age=7200" />
+<meta http-equiv="Expires" content="Mon, 20  Aug 2018 23:00:00 GMT" />
+```
+
+### http协议请求方式 ：
+> - GET：通常用于获取服务器资源
+> - POST：用于向与服务器发送资源
+> - PUT：向服务器新增资源
+> - PATCH：对服务器资源进行修改
+> - DELETE：删除指定的资源
+> - HEAD：请求资源的头部信息
+> - OPTIONS：预请求，让服务器判断请求是否合规
+> - CONNECT：HTTP/1.1协议中预留给能够将连接改为管道方式的代理服务器
+> - TRACE：回显服务器收到的请求，主要用于测试或诊断
+
+### GET和POST有什么区别？
+> - GET请求通过URL传输数据，而POST的数据通过请求体传输。
+> - POST的数据因为在请求主体内，所以有一定的安全性保证，而GET的数据在URL中，通过历史记录，缓存很容易查到数据信息。
+> - GET只允许 ASCII 字符，而POST无限制
+
+### 什么是http协议？
+> - HTTP 是一个属于应用层的超文本传输协议，
+> - http协议无状态，后续操作并不知道前面做了什么，需要借助cookie和session进行会话保存
+> - http无连接，每次连接只能处理一个请求，当服务器相应完毕后，会断开连接。
+
+### 什么是cookie？
+> - cookie是一个小型文本文件，存在浏览器中
+> - cookie可以帮我我们携带一些信息传给服务端，通常是以key-value出现的，如document.cookie='NAME=张三;expires=60'
+> - cookie的生命周期
+> 1. 会话期cookie：浏览器关闭后会被自动删除，会话期cookie不需要指定过期时间（Expires）或者有效期（Max-Age)，不过有的浏览器可能会有会话恢复功能，从而导致cookie的有效期被无线延长。
+> 2. 持久性cookie：需要设置过期时间（Expires）或者有效期（Max-Age)，当Cookie的过期时间被设定时，设定的日期和时间只与客户端相关，而不是服务端。
+> - 可以通过设置Secure属性让cookie不能被修改
+
+### 什么是session?
+> - session是作用在服务器上,是服务器端对象，记录浏览器和服务器之间的对话数据。
+> - session是依赖Cookie实现的。当用户第一次请求服务器时，服务器会自动创建一个session和一个cookie，cookie上记录了这次的sessionId，然后发给浏览器，浏览器后面的请求就会带上整个sessionId，然后服务器就通过sessionId查找对应的session对象使用，当用户关闭浏览器后cookie删除，后面再打开浏览器请求中没有sessionId又会重新创建一个session，原来的session会因为长时间无法访问而失效。
+
+### Token一般存放在哪里？
+> - 推荐存储再storage里面
+> - 存在cookie的优点是每次http请求上会自动带上cookie，更加方便一些，缺点是不够安全，容易被CSRF攻击，且所有请求都会被加上这个cookie。
+> - 存在storage中可以将token放在http头中发送，提高了安全性，而且可以灵活控制哪些请求需要加，哪些不要加。
+
+### http和https有什么区别？
+> - http传输是明文的，https使用SSL（安全套接层）或TLS（传输层安全）协议进行加密，保护数据在传输过程中的安全性。加密后的数据无法被窃听或篡改。
+> - http是80端口，https是443
+> - http没有数字证书，HTTPS使用数字证书来验证服务器的身份。证书由受信任的第三方机构颁发，可以确保你与服务器之间的连接是安全的，以防止中间人攻击。
+
+### HTTP的keep-alive是干什么的？
+> - HTTP keep-alive 也称为 HTTP 长连接。它通过重用一个 TCP 连接来发送/接收多个 HTTP请求，来减少创建/关闭多个 TCP 连接的开销。
+> - 使用 Connection: keep-alive
+
+## 前端工程化
+### 谈谈你对 WebPack的认识。
+> - webpack是一个模块打包工具
 
 ## 性能优化
 ### 虚拟列表
