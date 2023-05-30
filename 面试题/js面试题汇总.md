@@ -511,7 +511,47 @@ const width = rect.width;
 
 ## 前端工程化
 ### 谈谈你对 WebPack的认识。
-> - webpack是一个模块打包工具
+> - webpack是一个前端构建工具，可以将多个静态资源（html，css，js，图片等）打包成一个或多个静态文件，以便再浏览器中加载。
+> - webpack常用的配置属性有entry（入口文件），output（打包输出），module（配置加载器，里面可以配置loader rules来处理不同的模块），plugins（配置插件，用于扩展功能），devServer（开发服务器），mode（模式）等
+> - 可以通过配置loader对不同类型的模块进行转换和处理，因为webpack只识别js，我们可以通过loader把css，sass，less这种转换为可识别的js模块
+
+## Node.js
+### 什么是npm？它的作用是什么？
+> - npm是Node.js的包管理器，用于管理和共享JavaScript模块。它允许开发者通过命令行安装、更新、卸载和发布JavaScript包。npm还提供了一些工具和命令，用于管理项目依赖、构建脚本和运行测试等。
+
+### 如何安装一个npm包？
+> - 使用npm install package-name -g（全局安装，不会在package.json中），--save（保存在生产依赖 在package.json中的dependencies字段中），--save-dev（保存开发依赖在package.json中的devDependencies字段中）
+
+### 如何卸载一个npm包？
+> - npm uninstall <package-name>
+
+### package.json文件中的dependencies和devDependencies有什么区别？
+> - dependencies字段用于指定项目运行时所需的依赖包，而devDependencies字段用于指定只在开发过程中需要的依赖包，例如测试框架、构建工具等。运行npm install时，dependencies和devDependencies中的包将会被安装，但在生产环境中，只有dependencies中的包会被打包和部署。
+
+### 如何更新项目的依赖包？
+> - npm update
+
+### 如何发布自己的npm包？
+> - 需要在npm官网上注册一个账号，然后，在要发布的包的根目录下，使用命令行运行npm login以登录到npm账号。接下来，运行npm publish命令即可发布包。发布前需要确保package.json文件中的name字段是唯一的。
+
+### package-lock.json的作用是什么？
+> - 确保在不同环境下安装的依赖包的一致性，记录了当前项目的依赖关系树以及每个依赖包的精确版本号和安装路径。
+
+## 网络安全
+### 什么是XSS？
+> - xss是跨站脚本攻击，是一种代码注入攻击，通过目标网站上注入恶意脚本，使之在用户的浏览器上执行，利用这些脚本获取用户的敏感信息，如cookie等，进而危害数据安全。分为储存型，反射型，DOM型三种。
+> - 储存型：通常会通过表单提交存到后端数据库，当用户访问时会从后端获取从而执行，让用户收到长久的危害（如：论坛发帖用户看你帖子就会执行，商品评论，私信等）
+> - 反射型：通过构造出特殊的url，让用户点击时执行脚本。
+> - DOM型XSS：如果客户端有代码是通过从url获取参数时，当我们改造url让它执行xss脚本，当我们访问时就会执行。
+
+### 如何防止xss？
+> - 使用正则校验表单数据，并筛选特殊标签如\<script>\<iframe>标签等
+> - 将数据插入到html时使用contentText，innerText，不使用innerHtml
+> - 将敏感数据放到http only cookie中，这样无法通过js获取这个cookie
+
+### 什么是CSRF
+> - CSRF是跨站请求伪造，诱导受害者进入第三方网站，在第三方网站中，向被攻击网站发送跨站请求。利用受害者在被攻击网站已经注册的凭证，绕过后台的用户验证，达到冒充用户对被攻击的网站执行某种操作
+> - 如：
 
 ## 性能优化
 ### 虚拟列表
