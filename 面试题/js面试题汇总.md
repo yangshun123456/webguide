@@ -426,6 +426,29 @@ const top = rect.top;
 const width = rect.width;
 ```
 
+### canvas常用方法
+> - height：设置画布高度
+> - width：设置画布宽度
+> - getContext('2d')：获取CanvasRenderingContext2D对象
+> - toDataURL(type, encoderOptions)：返回一个base64编码，type为类型默认为image/png，encoderOptions为图片质量0-1默认为0.92
+> - toBlob(callback, type, encoderOptions)，同上，返回一个blob对象，可以通过封装成一个FormData上传
+```html
+// html
+<canvas id="my-house" width="300" height="300"></canvas>
+// js
+const canvas = document.getElementById('my-house');
+const ctx = canvas.getContext('2d'); // CanvasRenderingContext2D对象
+```
+
+### CanvasRenderingContext2D对象方法
+> - drawImage(image, dx, dy, dWidth, dHeight) 画一个图片
+> - getImageData(sx, sy, sw, sh)获取图片像素数据
+> - fillRect(x, y, width, height)画一个矩形
+> - fillText(text, x, y) 画文字
+> - fillStyle 用于填充绘画的颜色、渐变或模式
+> - save()使用栈保存当前的绘画样式状态，你可以使用 restore() 恢复任何改变
+> - restore()恢复到最近的绘制样式状态，此状态是通过 save() 保存到”状态栈“中最新的元素
+
 ## http相关
 
 ### http缓存
@@ -515,6 +538,13 @@ const width = rect.width;
 > - webpack常用的配置属性有entry（入口文件），output（打包输出），module（配置加载器，里面可以配置loader rules来处理不同的模块），plugins（配置插件，用于扩展功能），devServer（开发服务器），mode（模式）等
 > - 可以通过配置loader对不同类型的模块进行转换和处理，因为webpack只识别js，我们可以通过loader把css，sass，less这种转换为可识别的js模块
 
+### 如何新建一个webpack项目
+> - npm init -y
+> - npm install webpack webpack-cli --save-dev
+
+### webpack打包命令
+> - npx webpack --config ./webpack.config.js
+
 ## Node.js
 ### 什么是npm？它的作用是什么？
 > - npm是Node.js的包管理器，用于管理和共享JavaScript模块。它允许开发者通过命令行安装、更新、卸载和发布JavaScript包。npm还提供了一些工具和命令，用于管理项目依赖、构建脚本和运行测试等。
@@ -537,6 +567,11 @@ const width = rect.width;
 ### package-lock.json的作用是什么？
 > - 确保在不同环境下安装的依赖包的一致性，记录了当前项目的依赖关系树以及每个依赖包的精确版本号和安装路径。
 
+### npm和yarn的区别
+> - yarn比npm更快，yarn采用并行下载和缓存机制，而npm5以前则是没有缓存机制，无论是否下载过都会重新下载，npm5之后支持并行下载和缓存。
+> - npm使用package-lock.json确保下载版本一致，yarn则是通过yarn.lock。
+> - yarn对于网络不稳定的情况，如果网络中断，恢复后会接着下载，而npm5以前则会重新下载，npm5会继续下载。
+
 ## 网络安全
 ### 什么是XSS？
 > - xss是跨站脚本攻击，是一种代码注入攻击，通过目标网站上注入恶意脚本，使之在用户的浏览器上执行，利用这些脚本获取用户的敏感信息，如cookie等，进而危害数据安全。分为储存型，反射型，DOM型三种。
@@ -551,7 +586,12 @@ const width = rect.width;
 
 ### 什么是CSRF
 > - CSRF是跨站请求伪造，诱导受害者进入第三方网站，在第三方网站中，向被攻击网站发送跨站请求。利用受害者在被攻击网站已经注册的凭证，绕过后台的用户验证，达到冒充用户对被攻击的网站执行某种操作
-> - 如：
+> - 如：用户登录了A网站，黑客直到A网站的一个修改密码的接口，然后诱导用户点击一个黑客的网站，里面执行了这个修改密码的接口，从而无感的修改了用户的密码。
+
+### CSRF的解决方法
+> - 同源策略：可以有效阻止CSRF的攻击，但是如果后端配置了全部可访问则会存在问题。
+> - CSRF令牌（CSRF Token）：服务端生成一个唯一的令牌，当我们请求时服务端校验令牌是否准确。
+> - 加入验证码，当用户做敏感操作时，要先获取验证码，然后让服务端验证。
 
 ## 性能优化
 ### 虚拟列表
@@ -578,3 +618,5 @@ const width = rect.width;
 > - 使用虚拟化技术，避免一次性渲染过多节点，从而减少回流次数
 > - 使用 CSS 动画代替 JavaScript 动画：CSS 动画通常使用浏览器的硬件加速来执行动画，避免了频繁的回流和重绘
 
+### 大文件秒传
+> - 将大文件拆分，同时调用后端接口，然后拼接。

@@ -180,6 +180,19 @@ export default {
 ### vue双向绑定的原理
 > - 通过Object.defineProperty方法劫持数据，在数据修改的时候调用对应的update方法
 
+### vue2.0源码解析
+1. 数据劫持
+> - data通过Object.defineProperty挂载到Vue示例上，然后使用observe观察者模式对data内部的数据进行观察，此时要区分对象和数组，对象通过Object.defineProperty劫持，数组通过重写push，unshift，splice等方法，判断是否有新增属性，如果有则递归调用observe方法去监视，从而实现数据劫持。
+
+2. 模板编译
+> - render > template > el
+> - 获取template -> AST（抽象语法树）树 -> render函数 -> 虚拟节点 -> 设置patch（比对新旧节点）-> 打补丁到真实dom
+
+### 为何vue采用异步渲染？
+> - 为了提升性能，如果同步更新，每次更新数据都会让组件重新渲染，所以为了性能考虑，vue会在本轮数据更新完成之后再去异步更新视图。
+
+
+
 ## vue3面试题
 ### Vue2.0 和 Vue3.0 有什么区别？
 > 1. 性能的提升
