@@ -440,6 +440,22 @@ const canvas = document.getElementById('my-house');
 const ctx = canvas.getContext('2d'); // CanvasRenderingContext2D对象
 ```
 
+### postMessage的用法
+> - 安全地实现跨源通信，将message传递给指定窗口，postMessage(data,origin)方法接受两个参数：data：需要传输的数据，推荐使用字符串格式，其他格式浏览器兼容不好。origin（string）：指名目标窗口的源协议+主机+端口号，不限制目标源就写*，同源写/
+> - 接受信息，event包含3个参数：event.data: 接收到的数据，event.origin: 发送消息的文档源，event.source: 发生消息的文档中window对象的代理
+```javascript
+window.addEventListener('message',(event)=>{
+  // 判断源路径是否来自预期发生者
+  if(event.origin.includes('http://www.wrox.com')){
+    // 获取传过来的数据
+    console.log(event.data)
+    // 再传回去一条消息
+    event.source.postMessage('已收到消息', 'p2p.wrox.com')
+  }
+})
+
+```
+
 ### CanvasRenderingContext2D对象方法
 > - drawImage(image, dx, dy, dWidth, dHeight) 画一个图片
 > - getImageData(sx, sy, sw, sh)获取图片像素数据
