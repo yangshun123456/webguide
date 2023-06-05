@@ -301,14 +301,59 @@ var quotient = num1.dividedBy(num2); // 除法
 > - let、const： 声明变量和常量
 > - 模板字符串：增强版的字符串，用反引号标识，嵌入变量只需要放在${}中
 > - 箭头函数：ES6中函数定义不再使用关键字function()，而是利用了()=>来进行定义
-> - 解构赋值：按照类型的不同有不同的方式提取值，赋值，对象中的扩展运算符(...)用于取出参数对象中的所有可遍历属性，拷贝到当前对象之中
+> - 解构赋值：按照类型的不同有不同的方式提取值，赋值.
 > - Symbol：新增的基本数据类型，特点就是里面的值唯一
 > - Set 和 Map 数据结构
-> - 展开运算符(…): 可以将数组或对象里面的值展开, 还可以将 Set 数据结构转换为数组
+> - 展开运算符(…): 可以将数组或对象里面的值展开, 还可以将 Set 数据结构转换为数组，对象中的扩展运算符(...)用于取出参数对象中的所有可遍历属性，拷贝到当前对象之中
 > - for...of 循环: 可以遍历数组对象以及 Set 和 Map 数据结构
 > - class 类：通过 extends 实现继承
 > - promise、(async/await): 都是用来解决异步编程的方案
 > - proxy：代理对象，直接监听对象的变化，然后触发相应的逻辑
+
+### for...of和for...in
+> - for...in用于遍历对象中的每个属性，遍历的是key，同时也会遍历加到原型上的属性，不能遍历map set。
+> - for...of用于遍历可迭代对象，如数组，字符串，set，map等。遍历的是值。
+```javascript
+const myMap = new Map();
+myMap.set('key1', 'value1');
+myMap.set('key2', 'value2');
+myMap.set('key3', 'value3');
+
+for (const [key, value] of myMap) {
+  console.log(key + ' : ' + value);
+}
+myMap.forEach((value, key) => {
+  console.log(key + ' : ' + value);
+});
+```
+> - 如果让一个普通对象可以使用for...of需要实现一个Symbol.iterator方法
+```javascript
+const myObject = {
+  data: ['a', 'b', 'c'],
+  [Symbol.iterator]: function() {
+    let index = 0;
+
+    return {
+      next: () => {
+        if (index < this.data.length) {
+          return {
+            value: this.data[index++],
+            done: false
+          };
+        } else {
+          return {
+            done: true
+          };
+        }
+      }
+    };
+  }
+};
+
+for (const item of myObject) {
+  console.log(item);
+}
+```
 
 ### Promise是什么？
 > - Promise 是 es6 引入解决异步编程问题的解决方案
