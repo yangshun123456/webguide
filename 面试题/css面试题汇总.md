@@ -6,8 +6,8 @@
 
 ### box-sizing 属性是什么
 > box-sizing 属性允许您以特定的方式定义匹配某个区域的特定元素。
-> - content-box：默认值，内边距和外边距不包含在宽度高度中
-> - border-box：内边距和外边距包含在宽度高度中
+> - content-box：默认值，内边距和border不包含在宽度高度中 （ 标准盒子模型 ）
+> - border-box：内边距和border包含在宽度高度中（ 低版本IE ）
 
 ### 什么是CSS Sprite（“精灵图”）
 > - CSS Sprites叫 CSS精灵或者雪碧图，是一种网页图片应用处理方式。
