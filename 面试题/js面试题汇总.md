@@ -9,6 +9,7 @@
 ### js中的基础数据类型有哪几种? 了解包装对象吗？
 > - 六种，string, number, boolean, undefined, null, symbol
 > - 基础数据类型临时创建的临时对象，称为包装对象。其中 number、boolean 和 string 有包装对象，代码运行的过程中会找到对应的包装对象，然后包装对象把属性和方法给了基本类型，然后包装对象被系统进行销毁。
+> - 包装对象直接使用如const a = Number(123) a就是number类型，如果是const a = new Number(123)则a就是object
 > - 基本类型直接把变量名和值储存在栈中，引用数据类型值存在堆中，变量名和堆对应的地址存储在栈中。
 
 ### 如何判断this指向？箭头函数的this指向什么？
@@ -266,6 +267,16 @@ console.log((()=>{}) instanceof Object) // true
 > - 第二个参数标识这个数是一个几进制的数
 > - 返回值是十进制的
 > - 从左至右依次遍历，直到不满足进制条件终端，如果第一位就不是返回NAN，且小数点不能被转换，因为不符合条件如  parseInt(0.0000005) 为 5，因为0.0000005会被转换为5e-7，所以取了5，e-7无法识别，舍弃。
+> - 如果要处理0.00000005的话要引入Decimal.js
+```javascript
+var num1 = new Decimal(0.1); // 使用数字创建Decimal对象
+var num2 = new Decimal('0.2'); // 使用字符串创建Decimal对象
+var num3 = new Decimal(num1); // 使用另一个Decimal对象创建Decimal对象
+var sum = num1.plus(num2); // 加法
+var difference = num1.minus(num2); // 减法
+var product = num1.times(num2); // 乘法
+var quotient = num1.dividedBy(num2); // 除法
+```
 
 ### http状态码的了解
 > - 2 开头的表示请求成功，200表示一切正常
