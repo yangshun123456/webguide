@@ -710,3 +710,24 @@ window.addEventListener('message',(event)=>{
 
 ### vue中watch监听不到的情况 
 > - vue2对一开始没有对象中标明的属性，Object.defineProperty无法监听到
+
+### 防止手机中网页放大和缩小。
+> - 设置meta中的viewport属性
+> - width：控制viewport的宽度，这个值可以被指定，例如：500px。亦或者是“device-width”，意思是设置视口宽度为设备宽度。
+> - height：控制viewport的高度。height=device-height
+> - initial-scale：初始缩放比例，即每一次加载时页面缩放的比例。
+> - maximum-scale：允许用户缩放到的最大缩放比例。
+> - minimum-scale：允许用户缩放到的最小缩放比例。
+> - user-scaleable：是否允许用户缩放，可以传“yes”或“no”
+
+### iphone及ipad下输入框默认内阴影
+> - 设置css -webkit-appearance:none;
+
+### 某些Android手机圆角失效
+> - background-clip: padding-box;
+
+### 安卓内嵌网页缓存问题
+> - 设置mete 的 http-equiv为no-store
+
+### 监听安卓物理键使用popstate事件监听时ios返回不刷新
+> - 判断设备，当是ios的时候用window.location.href
