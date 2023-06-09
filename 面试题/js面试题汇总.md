@@ -617,6 +617,14 @@ window.addEventListener('message',(event)=>{
 ### webpack打包命令
 > - npx webpack --config ./webpack.config.js
 
+### webpack的一些性能优化
+> - 对于/node_modules/下的第三方库不进行loader处理，如babel-loader。
+> - 文件内容没有变化时可以使用cache-loader，把解析结果存下来，后面直接使用缓存的结果。
+> - 通过thread-loader进行多进程（并非多线程因为js是单线程模型）打包。
+> - dev-server采用热替代模式 hot: true。
+> - 使用css压缩插件OptimizeCSSAssetsPlugin，代码压缩插件TerserPlugin。
+> - 使用CompressionWebpackPlugin开启gzip压缩。
+
 ## Node.js
 ### 什么是npm？它的作用是什么？
 > - npm是Node.js的包管理器，用于管理和共享JavaScript模块。它允许开发者通过命令行安装、更新、卸载和发布JavaScript包。npm还提供了一些工具和命令，用于管理项目依赖、构建脚本和运行测试等。
@@ -691,4 +699,13 @@ window.addEventListener('message',(event)=>{
 > - 使用 CSS 动画代替 JavaScript 动画：CSS 动画通常使用浏览器的硬件加速来执行动画，避免了频繁的回流和重绘
 
 ### 大文件秒传
-> - 将大文件拆分，同时调用后端接口，然后拼接。
+> - 使用spark-md5库，将大文件拆分，分别对每一个片区进行md5的计算，得到对应的md5值
+> - 分片上传，控制次数调用后端接口，吧blob和md5值还有下标都传给后端，然后拼接。
+
+
+## 项目中遇到的BUG
+### 白屏处理
+> - ssr项目中，页面如果使用computed，created调用window对象的时候会白屏，报错。
+
+### vue中watch监听不到的情况 
+> - vue2对一开始没有对象中标明的属性，Object.defineProperty无法监听到

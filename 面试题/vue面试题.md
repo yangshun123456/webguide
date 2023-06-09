@@ -382,4 +382,46 @@ export default function () {
 > - 使用传统OptionsAPI中，新增或者修改一个需求，就需要分别在data，methods，computed里修改。
 > - 组合式API我们可以更加优雅的组织我们的代码，函数。让相关功能的代码更加有序的组织在一起。
 
+### vue3 hook函数比vue2的mixins好在哪
+> - 可以传参给hook，mixins不能
+> - 多个hook里面的属性不会相互冲突，而引入多个mixins会覆盖。
+
+## uni-app
+### uni-app的生命周期
+> - onload：次进入页面加载时触发，可以在 onLoad 的参数中获取打开当前页面路径中的参数。
+> - onShow：加载完成后、后台切到前台或重新进入页面时触发
+> - onReady：页面首次渲染完成时触发
+> - onHide：从前台切到后台或进入其他页面触发
+> - onUnload：页面卸载时触发
+> - onPullDownRefresh：监听用户下拉动作
+> - onReachBottom：页面上拉触底事件的处理函数
+> - onShareAppMessage：用户点击右上角转发
+> - onResize：监听窗口尺寸变化
+> - onPullDownRefresh：下拉回调
+
+### uni-app小程序分包
+> - 在page.js里面配置subPackages
+> - 建立分包根目录pagesB
+```json
+"subPackages": [{
+    "root": "pagesB",  
+    "pages": [
+        {
+            "path" : "line_otem_detail/line_otem_detail",
+            "style" : {
+                "navigationBarTitleText": "确认订单"
+            }
+        },
+     ]
+}]
+```
+> - 在进入页面前要加载这个资源
+```json
+"preloadRule": {
+    "pages/index/index": {
+        "network": "all",
+        "packages": ["pagesB"]
+    }
+},
+```
 
