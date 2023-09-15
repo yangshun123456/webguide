@@ -47,7 +47,7 @@
 > - em：相对于父元素或者自身，通过设置父元素，或者自身的font-size改变大小。
 > - rem：相对于根元素，通过改变根元素html的font-size改变大小。
 > - vh：viewpoint height，视窗高度，1vh=视窗高度的1%。
-> - vm：viewpoint width，视窗宽度，1vw=视窗宽度的1%。
+> - vw：viewpoint width，视窗宽度，1vw=视窗宽度的1%。
 > - %：相对父元素。
 > - vmin：vw和vh中较小的那个。
 > - vmax：vw和vh中较大的那个。
