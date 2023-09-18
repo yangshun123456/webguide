@@ -15,6 +15,7 @@
 ### 如何判断this指向？箭头函数的this指向什么？
 > - 普通函数直接调用中的this，this 指向 window 对象，严格模式下为 undefined。
 > - 在对象里调用的this指向调用函数的那个对象，this: 谁调用就指向谁
+![](img/this.png)
 > - 在构造函数以及类中的this通过new关键字指向实例对象
 > - 绑定事件函数的this谁调用就指向谁。
 > - 定时器中的this指向 window，因为定时器中采用回调函数作为处理函数，而回调函数的 this 指向 window。
