@@ -182,6 +182,7 @@ console.log((()=>{}) instanceof Object) // true
 > 13. slice(start, end) 返回截断后的数组，不改变原数组
 > 14. splice(start, number, value) 返回删除元素组成的数组，value 为插入项，改变原数组
 > 15. concat()拼接多个数组，返回拼接后的数组
+> 16. join(string)根据string拼接成一个字符串
 
 ### 字符串（String）方法
 > 1. toLowerCase() 此方法用于把字符串转为小写，并返回新的字符串。
