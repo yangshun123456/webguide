@@ -275,9 +275,9 @@ var num1 = new Decimal(0.1); // 使用数字创建Decimal对象
 var num2 = new Decimal('0.2'); // 使用字符串创建Decimal对象
 var num3 = new Decimal(num1); // 使用另一个Decimal对象创建Decimal对象
 var sum = num1.plus(num2); // 加法
-var difference = num1.minus(num2); // 减法
-var product = num1.times(num2); // 乘法
-var quotient = num1.dividedBy(num2); // 除法
+var difference = num1.sub(num2); // 减法
+var product = num1.mul(num2); // 乘法
+var quotient = num1.div(num2); // 除法
 ```
 
 ### http状态码的了解
