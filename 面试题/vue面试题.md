@@ -191,6 +191,106 @@ export default {
 ### 为何vue采用异步渲染？
 > - 为了提升性能，如果同步更新，每次更新数据都会让组件重新渲染，所以为了性能考虑，vue会在本轮数据更新完成之后再去异步更新视图。
 
+### vue2响应式原理
+> - 对象类型：通过Object.defineProperty()对属性的读取，修改进行拦截（数据劫持）。通过里面的getter和setter方法，进行查看和数据的修改，通过发布、订阅者模式进行数据与视图的响应式。
+    数组类型：通过重写更新数组的一系列方法来实现拦截。（对数组的变更方法进行了包裹）。
+> - Object.defineProperty(obj, prop, descriptor), 它接收三个参数
+> - 1. obj： 要定义属性的对象。它只接收对象
+> - 2. prop： 要定义或修改的属性的名称或 Symbol 。
+> - 3. descriptor： 要定义或修改的属性描述符。
+       descriptor是一个对象，它定义和修改指定的属性，它包含以下的键值，来对原对象进行数据劫持，即对象会执行这里面的逻辑。
+       configurable、enumerable 、 writable 、 value、get 、 set.
+       拥有布尔值的键 configurable、enumerable 和 writable 的默认值都是 false。
+       属性值和函数的键 value、get 和 set 字段的默认值为 undefined。
+```javascript
+	let oldArrayPrototype = Array.prototype;
+    let proto = Object.create(oldArrayPrototype);
+    // 如果要监听的对象是一个数组，我们又该怎么办呢。
+    //因为我们明确直到Object.defineProperty()的target只能是对象，如果是数组，
+    //好像Object.defineProperty()无法实现，那我们应该怎么办。
+    //而在vue2中，当我们改变数组时，视图也会变化，说明我们也要实现数组的响应式。
+    //这里我们需要换一个思路，我们去重写一下数组原型上的方法，我们把和数组有关的所有api，
+    //比如push、pop、shift、reserve ...全部重写一遍。
+    //当我们在执行这些操作的时候，同时把视图更新的操作也完成。这样就可以了。
+    //这里你可能会问，我们可以去修改数组的源码吗。诶，当然可以。实际上vue2也就是这么操作的。
+
+    ['push', 'shift', 'unshift'].forEach(method => {
+        // 函数劫持，重写函数
+        proto[method] = function () {
+            updateView()
+            oldArrayPrototype[method].call(this, ...arguments)
+        }
+    })
+    // 重写数组方法 push shift unshift pop reserve ...
+
+
+    function defineReactive(target, key, value) {
+        if (typeof value == 'object' && value !== null) {
+            observer(value)
+        }
+
+        // get()就是简单的取值，直接把这个属性对应的值返回就好了，
+        //set()就是当我们要修改值得时候，它接收一个参数就是我们修改的新值newValue，将要执行的逻辑，
+        //我们的目的就是要在修改值得时候将视图更新，于是在这里直接调用updataView()这个函数就好了，
+        //然后我们把新值赋值上去。这里做了一个小小的优化就是，如果新值刚好等于老值，
+        //我们就不需要去更新视图。于是最简陋的vue2响应式原理就实现了。
+        Object.defineProperty(target, key, {
+            get() {
+                return value
+            },
+
+            //如果我们要劫持的对象内部嵌套对象，当我们改变hobbies内部的属性的时候，
+            //视图依然不会更新，这里只能用到递归来解决。 
+            set(newValue) {
+                if (newValue !== value) {
+                    updateView()
+                    value = newValue
+                }
+            }
+        })
+    }
+    // 首先，我们需要有一个观察者，在vue2源码中也有这个，它的目的是用于判断，
+    //我们要定义或修改的target是不是一个对象。
+    //如果是对象，我们用Object.defineProperty()对它进行数据劫持。如果不是我们就直接返回target.
+    function observer(target) { // 观察者
+        if (typeof target !== 'object' || target == null) {
+            return target
+        }
+
+        if (Array.isArray(target)) {
+            // Object.setPrototypeOf(target, proto)
+            target.__proto__ = proto
+        }
+
+        for (let key in target) {
+            // defineReactive(target, key, target[key]) ，
+            //这个方法就是来调用Object.defineProperty的。
+            //target是我们要定义或修改的对象，key是要修改或定义的属性，target[key]就是这个属性的值。
+            defineReactive(target, key, target[key])
+        }
+    }
+
+    function updateView() {
+        console.log('更新视图');
+    }
+    let data = {
+        name: '老王',
+        hobbies: {
+            a: '喝酒',
+            b: '抽烟'
+        },
+        job: ['driver', 'coder', 'cooker']
+    }
+    observer(data)
+    // console.log(dat)
+    console.log(data.hobbies.a);
+    data.hobbies.a = '烫头'
+    console.log(data.hobbies.a);
+    console.log(data.job)
+    data.job.push('teacher')
+    console.log(data.job)
+
+```
 
 
 ## vue3面试题
@@ -385,6 +485,125 @@ export default function () {
 ### vue3 hook函数比vue2的mixins好在哪
 > - 可以传参给hook，mixins不能
 > - 多个hook里面的属性不会相互冲突，而引入多个mixins会覆盖。
+
+### vue3响应式原理
+> - 通过Proxy（代理）： 拦截对象中任意属性的变化，包括：属性值的读写，属性的增加，属性的删除等。
+> - 通过Reffect（反射）： 对源对象的属性进行操作
+```javascript
+new Proxy(data,{
+  //拦截读取属性值
+  get(target, prop){
+    return Reflect.get(target, prop)
+  },
+  //拦截设置属性值或添加新属性
+  set(target, prop, value){
+    return Reflect.set(target, prop, value)
+  },
+  //拦截删除属性
+  deleteProperty(target, prop){
+    return Reflect.deleteProperty(target, prop)
+  }
+})
+
+// 创建简单的响应式对象
+// vue3响应式原理
+// 2.0需要递归，数据改变length属性是无效的，对象不存在的属性是不能被拦截的
+
+let toProxy = new WeakMap() // 原对象：代理过的对象
+let toRaw = new WeakSet() // 代理过的对象：原对象
+
+
+function isObject(val) {
+  return typeof val === 'object' && val !== 'null'
+}
+
+function reactive(target) {
+  // 创建响应式对象
+  return createReactiveObject(target)
+}
+
+function createReactiveObject(target) { // 创建代理后的响应式对象
+  if (!isObject(target)) { // 如果不是对象，直接返回
+    return target
+  }
+
+  let proxy = toProxy.get(target) // 如果对象已经被代理过了，直接返回
+  if(proxy) {
+    return proxy
+  }
+
+  let baseHandler = {
+    get(target,key,receiver) { //receiver:被代理后的对象
+      console.log('获取')
+      // receiver.get() ==》 new proxy().get 这会报错，
+      //也就意味着我们不能直接取到被代理对象上的属性
+      // 这时候我们需要用到Reflect,这其实也是一个对象，
+      //它只不过也含有一些明显属于对象上的方法，且和proxy上的方法一一对应
+//取值的时候判断，是否是一个对象，如果是就再此代理，
+//不是就直接返回。
+//我们取值是一层一层往下取，如果有嵌套的话，会执行多次get操作。
+      let result = Reflect.get(target,key,receiver)
+      return isObject(result) ? reactive(result) : result
+      //递归多层代理，相比于vue2的优势是，vue2默认递归，
+      //而vue3中，只要不使用就不会递归。
+    },
+    set(target,key,value,receiver) {
+      // console.log('设置');
+      let hadkey = target.hasOwnProperty(key)
+      let oldValue = target[key]
+      if(!hadkey) {
+        console.log('新增')
+      } else if (oldValue !== value) {
+        console.log('修改')
+      }
+      let res = Reflect.set(target,key,value,receiver)
+      return res
+    },
+    deleteProperty(target,key) {
+      console.log('删除')
+      let res = Reflect.deleteProperty(target,key)
+      return res
+    }
+  }
+  let observed = new Proxy(target, baseHandler)
+  toProxy.set(target, observed)
+  toRaw.add(observed,target)
+  return observed
+}
+
+
+
+let proxy = reactive({'name': 'wn'})
+proxy.sex = 'boy'
+console.log(proxy.sex)
+// proxy.name
+// proxy.name = 'kite'
+// delete proxy.name
+// proxy.age
+// proxy.name = 'kite'
+// console.log(proxy.name);
+// let proxy = reactive([1,2,3])
+// proxy.push(4)
+// proxy.length = 5
+// console.log(proxy);
+
+// 如果一个对象被代理后了，那么就不再需要再被代理
+
+```
+
+### 为什么要使用Reflect()？
+> - set(target,key,value,receiver)，set接受四个参数，依次为目标对象、属性名、属性值和 Proxy代理后的对象，其中最后一个参数可选。当我们使用set时，会把这些参数传进来，就是把这个键对应的值设置到proxy代理后的对象中。也就是说，我们应该receiver.set(target,key,value,receiver)。然而这样会报错，因为不能在proxy内部再调用proxy,上面这样相当于new proxy.set()，会报错。于是我们使用Reflect.set().
+
+### 什么是Reflect()?
+> - Reflect对象与Proxy对象一样，也是 ES6 为了操作对象而提供的新 API。Reflect对象的设计目的有:
+> - 将Object对象的一些明显属于语言内部的方法（比如Object.defineProperty），放到Reflect对象上
+> - 修改某些Object方法的返回结果，让其变得更合理。
+> - 让Object操作都变成函数行为。
+> - Reflect对象的方法与Proxy对象的方法一一对应，只要是Proxy对象的方法，就能在Reflect对象上找到对应的方法。
+
+这里就是因为不能调用receiver.set(),于是我们使用Reflect()中的方法，其实作用是一样的。
+get(),deletePrpperty(),has()…
+Proxy有十三种属性，都使用了Reflect.
 
 ## uni-app
 ### uni-app的生命周期
