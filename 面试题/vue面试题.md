@@ -621,6 +621,9 @@ Proxy有十三种属性，都使用了Reflect.
 ### uni-app小程序分包
 > - 在page.js里面配置subPackages
 > - 建立分包根目录pagesB
+> - 主包跳转分包需要带上分包名  如：/分包名/页面路径？参数1=值&&参数2=值
+> - /pagesB/pages/news-info/news-info?id=3&&title=about"
+
 ```json
 "subPackages": [{
     "root": "pagesB",  
